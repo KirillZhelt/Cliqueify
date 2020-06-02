@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.servlet.view.RedirectView;
 
+import javax.validation.Valid;
 import java.util.Optional;
 
 @Controller
@@ -33,14 +33,16 @@ class RoomsController {
     }
 
     @PostMapping("/")
-    public RedirectView createRoom(@ModelAttribute RoomCreationParamsDTO roomParams, BindingResult result) {
+    public String createRoom(@Valid @ModelAttribute(name = "roomParams") RoomCreationParamsDTO roomParams, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("roomParams", roomParams);
+            return "create-room";
+        }
+
         Room room = this.modelMapper.map(roomParams, Room.class);
         Room createdRoom = this.roomsService.createRoom(room);
 
-        RedirectView rv = new RedirectView();
-        rv.setContextRelative(true);
-        rv.setUrl(String.format("/rooms/%d", createdRoom.getId()));
-        return rv;
+        return String.format("redirect:/rooms/%d", createdRoom.getId());
     }
 
     @GetMapping("/rooms/{roomId}")

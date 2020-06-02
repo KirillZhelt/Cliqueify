@@ -1,15 +1,22 @@
 package dev.kirillzhelt.cliqueify.dto;
 
 import dev.kirillzhelt.cliqueify.model.PublicityType;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
 public class RoomCreationParamsDTO {
 
+    @Size(min = 3, max = 256)
     private String name;
 
+    @NotNull
     private PublicityType publicityType;
 
+    @NotNull
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate expiryDate;
 
     public RoomCreationParamsDTO() {

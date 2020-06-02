@@ -5,17 +5,20 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     </head>
     <body>
-        <form th:action="@{/}" th:object="${roomParams}" method="post">
+    <form th:action="@{/}" th:object="${roomParams}" method="post">
             <label>Room name</label>
             <input type="text" th:field="*{name}" />
+            <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
 
             <label>Publicity</label>
             <select th:field="*{publicityType}">
                 <option th:each="type : ${T(dev.kirillzhelt.cliqueify.model.PublicityType).values()}" th:value="${type}" th:text="${type}"></option>
             </select>
+            <p th:if="${#fields.hasErrors('publicityType')}" th:errors="*{publicityType}"></p>
 
             <label>Active until</label>
-            <input type="datetime-local" th:field="*{expiryDate}" />
+            <input type="date" th:field="*{expiryDate}" />
+            <p th:if="${#fields.hasErrors('expiryDate')}" th:errors="*{expiryDate}"></p>
 
             <button>Create room</button>
         </form>
