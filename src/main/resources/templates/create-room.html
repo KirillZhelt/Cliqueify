@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Cliqueify</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    </head>
+    <body>
+        <form th:action="@{/}" th:object="${roomParams}" method="post">
+            <label>Room name</label>
+            <input type="text" th:field="*{name}" />
+
+            <label>Publicity</label>
+            <select th:field="*{publicityType}">
+                <option th:each="type : ${T(dev.kirillzhelt.cliqueify.model.PublicityType).values()}" th:value="${type}" th:text="${type}"></option>
+            </select>
+
+            <label>Active until</label>
+            <input type="datetime-local" th:field="*{expiryDate}" />
+
+            <button>Create room</button>
+        </form>
+    </body>
+</html>
