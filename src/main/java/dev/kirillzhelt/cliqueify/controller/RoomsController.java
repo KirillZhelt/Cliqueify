@@ -29,14 +29,13 @@ class RoomsController {
     @GetMapping("/")
     public String getRoomCreationForm(Model model) {
         model.addAttribute("roomParams", new RoomCreationParamsDTO());
-        return "create-room";
+        return "create_room";
     }
 
     @PostMapping("/")
-    public String createRoom(@Valid @ModelAttribute(name = "roomParams") RoomCreationParamsDTO roomParams, BindingResult result, Model model) {
+    public String createRoom(@Valid @ModelAttribute(name = "roomParams") RoomCreationParamsDTO roomParams, BindingResult result) {
         if (result.hasErrors()) {
-            model.addAttribute("roomParams", roomParams);
-            return "create-room";
+            return "create_room";
         }
 
         Room room = this.modelMapper.map(roomParams, Room.class);

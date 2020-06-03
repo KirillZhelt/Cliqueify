@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="base/base_layout :: base_layout(~{::title}, ~{::section})">
     <head>
         <title>Cliqueify</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     </head>
     <body>
-    <form th:action="@{/}" th:object="${roomParams}" method="post">
+
+    <section>
+        <form th:action="@{/}" th:object="${roomParams}" method="post">
             <label>Room name</label>
             <input type="text" th:field="*{name}" />
             <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
@@ -22,5 +23,7 @@
 
             <button>Create room</button>
         </form>
+    </section>
+
     </body>
 </html>
