@@ -19,7 +19,7 @@
                 <p th:if="${#fields.hasErrors('publicityType')}" th:errors="*{publicityType}"></p>
 
                 <label class="mt-2">Active until</label>
-                <input class="form-control" type="date" th:field="*{expiryDate}" />
+                <input class="form-control" type="date" th:min="${minExpiryDate}" th:field="*{expiryDate}" />
                 <p th:if="${#fields.hasErrors('expiryDate')}" th:errors="*{expiryDate}"></p>
 
                 <button class="btn btn-primary mt-2">Create room</button>
