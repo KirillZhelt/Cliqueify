@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="base_layout(title, content)">
+    <head>
+        <title th:replace="${title}"></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <th:block th:replace="/base/base_dependencies :: base_dependencies" />
+    </head>
+    <body>
+        <div th:insert="/fragments/header :: header"></div>
+
+        <section th:replace="${content}">
+        </section>
+    </body>
+</html>

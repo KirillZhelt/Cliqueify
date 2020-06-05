@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="base/base_layout :: base_layout(~{::title}, ~{::section})">
+    <head>
+        <title th:text="|Room ${room.id}|"></title>
+    </head>
+    <body>
+        <section>
+            <p th:text="${room.name}"></p>
+        </section>
+    </body>
+</html>

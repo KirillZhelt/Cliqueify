@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="base/base_layout :: base_layout(~{::title}, ~{::section})">
+    <head>
+        <title>Cliqueify</title>
+    </head>
+    <body>
+
+    <section>
+        <form th:action="@{/}" th:object="${roomParams}" method="post">
+            <div class="form-group ml-5" style="width: 40%">
+                <label class="mt-2">Room name</label>
+                <input class="form-control"type="text" th:field="*{name}" />
+                <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+
+                <label class="mt-2">Publicity</label>
+                <select class="form-control" th:field="*{publicityType}">
+                    <option th:each="type : ${T(dev.kirillzhelt.cliqueify.model.PublicityType).values()}" th:value="${type}" th:text="${type}"></option>
+                </select>
+                <p th:if="${#fields.hasErrors('publicityType')}" th:errors="*{publicityType}"></p>
+
+                <label class="mt-2">Active until</label>
+                <input class="form-control" type="date" th:min="${minExpiryDate}" th:field="*{expiryDate}" />
+                <p th:if="${#fields.hasErrors('expiryDate')}" th:errors="*{expiryDate}"></p>
+
+                <button class="btn btn-primary mt-2">Create room</button>
+            </div>
+        </form>
+    </section>
+
+    </body>
+</html>
