@@ -18,7 +18,7 @@ public class User extends IdentifiedModel implements UserDetails {
 
     private String password;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles;
 
     public User() {

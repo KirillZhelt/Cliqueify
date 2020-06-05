@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="base/base_layout :: base_layout(~{::title}, ~{::section})">
+<head>
+    <title th:text="Registration"></title>
+</head>
+<body>
+<section>
+    <form method="post" th:action="@{/registration}" th:object="${user}">
+        <h2>Register</h2>
+
+        <input name="username" type="text" placeholder="Username"
+               autofocus="true" th:field="*{username}"/>
+        <input name="password" type="password" placeholder="Password" th:field="*{password}"/>
+        <input name="passwordConfirm" type="password" placeholder="Confirm password" th:field="*{passwordConfirm}"/>
+
+        <button type="submit">Register</button>
+        <h4><a th:href="@{/login}">Log in</a></h4>
+    </form>
+</section>
+</body>
+</html>

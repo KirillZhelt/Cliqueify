@@ -33,9 +33,12 @@ public class UserServiceImpl implements UserService {
             return false;
         }
 
-        user.setRoles(Collections.singleton(new Role(1, "ROLE_USER")));
+        Optional<Role> userRole = roleRepository.findByName("ROLE_USER");
+
+        user.setRoles(Collections.singleton(userRole.get()));
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
+
         return true;
     }
 
