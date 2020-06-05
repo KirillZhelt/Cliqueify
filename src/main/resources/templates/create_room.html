@@ -9,7 +9,7 @@
         <form th:action="@{/}" th:object="${roomParams}" method="post">
             <div class="form-group ml-5" style="width: 40%">
                 <label class="mt-2">Room name</label>
-                <input class="form-control"type="text" th:field="*{name}" />
+                <input class="form-control" type="text" th:field="*{name}" />
                 <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
 
                 <label class="mt-2">Publicity</label>
