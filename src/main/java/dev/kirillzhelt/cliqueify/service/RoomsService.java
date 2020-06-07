@@ -6,11 +6,13 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public interface RoomsService {
 
     Room createRoom(Room room);
     Optional<Room> getRoomById(long id);
+    Set<Room> getPublicRooms();
 
 }
