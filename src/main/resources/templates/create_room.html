@@ -6,6 +6,8 @@
     <body>
 
     <section>
+        <h2 class="mt-3 ml-5 mb-3">Create new room</h2>
+
         <form th:action="@{/create-room}" th:object="${roomParams}" method="post">
             <div class="form-group ml-5" style="width: 40%">
                 <label class="mt-2">Room name</label>
@@ -22,7 +24,7 @@
                 <input class="form-control" type="date" th:min="${minExpiryDate}" th:field="*{expiryDate}" />
                 <p th:if="${#fields.hasErrors('expiryDate')}" th:errors="*{expiryDate}"></p>
 
-                <button class="btn btn-primary mt-2">Create room</button>
+                <button class="btn btn-primary mt-2">Create</button>
             </div>
         </form>
     </section>
