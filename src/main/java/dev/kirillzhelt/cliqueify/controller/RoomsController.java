@@ -2,9 +2,12 @@ package dev.kirillzhelt.cliqueify.controller;
 
 import dev.kirillzhelt.cliqueify.dto.RoomCreationParamsDTO;
 import dev.kirillzhelt.cliqueify.model.Room;
+import dev.kirillzhelt.cliqueify.model.User;
 import dev.kirillzhelt.cliqueify.service.RoomsService;
+import dev.kirillzhelt.cliqueify.service.UserService;
 import dev.kirillzhelt.cliqueify.validator.ExpiryDateValidator;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -23,30 +27,38 @@ import java.util.Optional;
 class RoomsController {
 
     private final RoomsService roomsService;
+    private final UserService userService;
+
     private final ModelMapper modelMapper;
     private final DateTimeFormatter dateFormatter;
 
-    public RoomsController(RoomsService roomsService, ModelMapper modelMapper, DateTimeFormatter dateFormatter) {
+    public RoomsController(RoomsService roomsService, ModelMapper modelMapper, DateTimeFormatter dateFormatter,
+                           UserService userService) {
         this.roomsService = roomsService;
+        this.userService = userService;
+
         this.modelMapper = modelMapper;
         this.dateFormatter = dateFormatter;
     }
 
-    @GetMapping("/")
+    @GetMapping("/create-room")
     public String getRoomCreationForm(Model model) {
         this.setupRoomCreationForm(model);
         model.addAttribute("roomParams", new RoomCreationParamsDTO());
         return "create_room";
     }
 
-    @PostMapping("/")
-    public String createRoom(@Valid @ModelAttribute(name = "roomParams") RoomCreationParamsDTO roomParams, BindingResult result, Model model) {
+    @PostMapping("/create-room")
+    public String createRoom(@Valid @ModelAttribute(name = "roomParams") RoomCreationParamsDTO roomParams, BindingResult result, Model model,
+                             Principal principal) {
         if (result.hasErrors()) {
             this.setupRoomCreationForm(model);
             return "create_room";
         }
 
         Room room = this.modelMapper.map(roomParams, Room.class);
+        Optional<User> user = this.userService.findUserByUsername(principal.getName());
+        user.ifPresent(room::setOwner);
         Room createdRoom = this.roomsService.createRoom(room);
 
         return String.format("redirect:/rooms/%d", createdRoom.getId());
@@ -55,6 +67,17 @@ class RoomsController {
     private void setupRoomCreationForm(Model model) {
         String minExpiryDate = ExpiryDateValidator.getMinExpiryDate().format(this.dateFormatter);
         model.addAttribute("minExpiryDate", minExpiryDate);
+    }
+
+    @GetMapping("/rooms")
+    public String rooms(Model model, Principal principal) {
+        Optional<User> user = this.userService.findUserByUsername(principal.getName());
+        if (user.isPresent()) {
+            model.addAttribute("rooms", user.get().getRooms());
+            return "rooms";
+        }
+
+        return "error";
     }
 
     @GetMapping("/rooms/{roomId}")

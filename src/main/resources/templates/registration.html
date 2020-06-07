@@ -6,8 +6,8 @@
 <body>
 <section>
     <form method="post" th:action="@{/registration}" th:object="${user}">
-        <div class="form-group ml-5" style="width: 40%">
-            <h3>Register</h3>
+        <div class="form-group ml-5 mt-3" style="width: 40%">
+            <h2>Register</h2>
 
             <input class="form-control" name="username" type="text" placeholder="Username"
                    autofocus="true" th:field="*{username}"/>

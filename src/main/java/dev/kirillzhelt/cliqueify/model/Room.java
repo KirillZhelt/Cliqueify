@@ -3,6 +3,7 @@ package dev.kirillzhelt.cliqueify.model;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.ManyToOne;
 import java.time.LocalDate;
 
 @Entity
@@ -15,13 +16,17 @@ public class Room extends IdentifiedModel {
 
     private LocalDate expiryDate;
 
+    @ManyToOne(optional = false)
+    private User owner;
+
     public Room() {
     }
 
-    public Room(String name, PublicityType publicityType, LocalDate expiryDate) {
+    public Room(String name, PublicityType publicityType, LocalDate expiryDate, User owner) {
         this.name = name;
         this.publicityType = publicityType;
         this.expiryDate = expiryDate;
+        this.owner = owner;
     }
 
     public String getName() {
@@ -48,13 +53,22 @@ public class Room extends IdentifiedModel {
         this.expiryDate = expiryDate;
     }
 
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
+
     @Override
     public String toString() {
         return "Room{" +
-                "id=" + this.getId() +
-                ", name='" + name + '\'' +
+                "name='" + name + '\'' +
                 ", publicityType=" + publicityType +
                 ", expiryDate=" + expiryDate +
+                ", owner=" + owner +
+                ", id=" + id +
                 '}';
     }
 }
