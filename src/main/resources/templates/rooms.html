@@ -19,12 +19,26 @@
             </tr>
         </thead>
         <tbody>
-            <tr th:each="room : ${rooms}">
-                <td th:text="${room.name}"></td>
-                <td th:text="${room.expiryDate}"></td>
-            </tr>
+            <script>
+                function rowClicked(roomId) {
+                    location.href = `/rooms/${roomId}`;
+                }
+            </script>
+
+            <th:block th:each="room: ${rooms}">
+                <a th:href="@{/rooms/{id}(id=${room.id})}">
+                    <tr class="room-row" style="cursor: pointer;"
+                        th:onclick="'javascript:rowClicked(\'' + ${room.id} + '\');'">
+                        <td th:text="${room.name}"></td>
+                        <td th:text="${room.expiryDate}"></td>
+                    </tr>
+                </a>
+            </th:block>
         </tbody>
     </table>
 </section>
+
+
+
 </body>
 </html>
