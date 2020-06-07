@@ -6,7 +6,7 @@
     <body>
 
     <section>
-        <form th:action="@{/}" th:object="${roomParams}" method="post">
+        <form th:action="@{/create-room}" th:object="${roomParams}" method="post">
             <div class="form-group ml-5" style="width: 40%">
                 <label class="mt-2">Room name</label>
                 <input class="form-control" type="text" th:field="*{name}" />

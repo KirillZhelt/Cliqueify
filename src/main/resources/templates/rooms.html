@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="base/base_layout :: base_layout(~{::title}, ~{::section})">
+<head>
+    <title>My rooms</title>
+</head>
+<body>
+<section>
+    <h2 class="mt-3 ml-5">My rooms</h2>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">
+                    Name
+                </th>
+                <th scope="col">
+                    Expire date
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="room : ${rooms}">
+                <td th:text="${room.name}"></td>
+                <td th:text="${room.expiryDate}"></td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+</body>
+</html>

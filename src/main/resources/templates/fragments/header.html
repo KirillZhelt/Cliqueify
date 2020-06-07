@@ -6,10 +6,10 @@
 <body>
 
     <header th:fragment="header">
-        <nav class="navbar navbar-default">
+        <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
             <div class="container-fluid">
                 <div class="navbar-header">
-                    <a class="navbar-brand" th:href="@{~/}">Cliqueify</a>
+                    <a class="navbar-brand" th:href="@{~/rooms}">Cliqueify</a>
                 </div>
 
                 <th:block sec:authorize="isAuthenticated()">
