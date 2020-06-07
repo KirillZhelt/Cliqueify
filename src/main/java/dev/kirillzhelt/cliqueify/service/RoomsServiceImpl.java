@@ -1,11 +1,13 @@
 package dev.kirillzhelt.cliqueify.service;
 
+import dev.kirillzhelt.cliqueify.model.PublicityType;
 import dev.kirillzhelt.cliqueify.model.Room;
 import dev.kirillzhelt.cliqueify.repository.RoomsRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class RoomsServiceImpl implements RoomsService {
@@ -26,4 +28,8 @@ public class RoomsServiceImpl implements RoomsService {
         return this.repository.findById(id);
     }
 
+    @Override
+    public Set<Room> getPublicRooms() {
+        return this.repository.findAllByPublicityType(PublicityType.PUBLIC);
+    }
 }

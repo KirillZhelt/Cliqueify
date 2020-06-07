@@ -22,6 +22,7 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import java.util.Set;
 
 @Controller
 class RoomsController {
@@ -90,5 +91,12 @@ class RoomsController {
         }
 
         return "error";
+    }
+
+    @GetMapping("/browse-rooms")
+    public String browseRooms(Model model) {
+        Set<Room> rooms = this.roomsService.getPublicRooms();
+        model.addAttribute("rooms", rooms);
+        return "browse_rooms";
     }
 }
