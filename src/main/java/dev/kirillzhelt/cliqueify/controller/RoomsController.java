@@ -95,6 +95,12 @@ class RoomsController {
         }
     }
 
+    @GetMapping("/rooms/link/{token}")
+    public String room(@PathVariable String token, Model model) {
+
+        return null;
+    }
+
     @GetMapping("/browse-rooms")
     public String browseRooms(Model model) {
         Set<Room> rooms = this.roomsService.getPublicRooms();
