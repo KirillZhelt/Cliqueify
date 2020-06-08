@@ -37,6 +37,13 @@ public class RoomsServiceImpl implements RoomsService {
     }
 
     @Override
+    public Optional<Room> getRoomByToken(String token) {
+        Key key = Keys.hmacShaKeyFor(environment.getProperty("secret.jwt-key").getBytes());
+        String idStr = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().getSubject();
+        return this.getRoomById(Integer.parseInt(idStr));
+    }
+
+    @Override
     public Set<Room> getPublicRooms() {
         return this.repository.findAllByPublicityType(PublicityType.PUBLIC);
     }

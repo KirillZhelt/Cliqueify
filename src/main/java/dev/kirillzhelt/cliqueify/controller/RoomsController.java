@@ -96,9 +96,15 @@ class RoomsController {
     }
 
     @GetMapping("/rooms/link/{token}")
-    public String room(@PathVariable String token, Model model) {
-
-        return null;
+    public String roomByToken(@PathVariable String token, Model model) {
+        Optional<Room> roomOptional = this.roomsService.getRoomByToken(token);
+        if (roomOptional.isPresent()) {
+            model.addAttribute("room", roomOptional.get());
+            return "room";
+        } else {
+            model.addAttribute("errorMessage", "Invalid link");
+            return "error";
+        }
     }
 
     @GetMapping("/browse-rooms")

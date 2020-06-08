@@ -13,6 +13,7 @@ public interface RoomsService {
 
     Room createRoom(Room room);
     Optional<Room> getRoomById(long id);
+    Optional<Room> getRoomByToken(String token);
     Set<Room> getPublicRooms();
 
 }
