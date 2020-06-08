@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="base/base_layout :: base_layout(~{::title}, ~{::section})">
+<head>
+    <title>We're sorry</title>
+</head>
+<body>
+<section>
+    <div class="alert alert-danger" role="alert" th:text="${errorMessage}">
+    </div>
+</section>
+</body>
+</html>

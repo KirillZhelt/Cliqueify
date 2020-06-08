@@ -1,16 +1,15 @@
 package dev.kirillzhelt.cliqueify.controller;
 
 import dev.kirillzhelt.cliqueify.dto.RoomCreationParamsDTO;
+import dev.kirillzhelt.cliqueify.model.PublicityType;
 import dev.kirillzhelt.cliqueify.model.Room;
 import dev.kirillzhelt.cliqueify.model.User;
 import dev.kirillzhelt.cliqueify.service.RoomsService;
 import dev.kirillzhelt.cliqueify.service.UserService;
 import dev.kirillzhelt.cliqueify.validator.ExpiryDateValidator;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.validation.Valid;
 import java.security.Principal;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.Set;
@@ -58,8 +56,8 @@ class RoomsController {
         }
 
         Room room = this.modelMapper.map(roomParams, Room.class);
-        Optional<User> user = this.userService.findUserByUsername(principal.getName());
-        user.ifPresent(room::setOwner);
+        User user = this.getUserFromPrincipal(principal);
+        room.setOwner(user);
         Room createdRoom = this.roomsService.createRoom(room);
 
         return String.format("redirect:/rooms/%d", createdRoom.getId());
@@ -72,25 +70,41 @@ class RoomsController {
 
     @GetMapping("/rooms")
     public String rooms(Model model, Principal principal) {
-        Optional<User> user = this.userService.findUserByUsername(principal.getName());
-        if (user.isPresent()) {
-            model.addAttribute("rooms", user.get().getRooms());
-            return "rooms";
-        }
-
-        return "error";
+        User user = this.getUserFromPrincipal(principal);
+        model.addAttribute("rooms", user.getRooms());
+        return "rooms";
     }
 
     @GetMapping("/rooms/{roomId}")
-    public String room(@PathVariable long roomId, Model model) {
-        Optional<Room> room = this.roomsService.getRoomById(roomId);
+    public String room(@PathVariable long roomId, Model model, Principal principal) {
+        Optional<Room> roomOptional = this.roomsService.getRoomById(roomId);
 
-        if (room.isPresent()) {
-            model.addAttribute("room", room.get());
+        if (roomOptional.isPresent()) {
+            Room room = roomOptional.get();
+
+            if (room.getPublicityType() == PublicityType.PRIVATE && room.getOwner() != this.getUserFromPrincipal(principal)) {
+                model.addAttribute("errorMessage", "You don't have access to this room");
+                return "error";
+            }
+
+            model.addAttribute("room", room);
             return "room";
+        } else {
+            model.addAttribute("errorMessage", "Room not found");
+            return "error";
         }
+    }
 
-        return "error";
+    @GetMapping("/rooms/link/{token}")
+    public String roomByToken(@PathVariable String token, Model model) {
+        Optional<Room> roomOptional = this.roomsService.getRoomByToken(token);
+        if (roomOptional.isPresent()) {
+            model.addAttribute("room", roomOptional.get());
+            return "room";
+        } else {
+            model.addAttribute("errorMessage", "Invalid link");
+            return "error";
+        }
     }
 
     @GetMapping("/browse-rooms")
@@ -98,5 +112,9 @@ class RoomsController {
         Set<Room> rooms = this.roomsService.getPublicRooms();
         model.addAttribute("rooms", rooms);
         return "browse_rooms";
+    }
+
+    private User getUserFromPrincipal(Principal principal) {
+        return this.userService.findUserByUsername(principal.getName()).orElseThrow();
     }
 }

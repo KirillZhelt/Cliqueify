@@ -7,3 +7,5 @@ spring.datasource.username=
 spring.datasource.password=
 
 spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
+
+server.error.whitelabel.enabled=false

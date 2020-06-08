@@ -1,9 +1,6 @@
 package dev.kirillzhelt.cliqueify.model;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
@@ -18,6 +15,8 @@ public class Room extends IdentifiedModel {
 
     @ManyToOne(optional = false)
     private User owner;
+
+    private String linkToken;
 
     public Room() {
     }
@@ -61,6 +60,14 @@ public class Room extends IdentifiedModel {
         this.owner = owner;
     }
 
+    public String getLinkToken() {
+        return linkToken;
+    }
+
+    public void setLinkToken(String linkToken) {
+        this.linkToken = linkToken;
+    }
+
     @Override
     public String toString() {
         return "Room{" +
@@ -68,6 +75,7 @@ public class Room extends IdentifiedModel {
                 ", publicityType=" + publicityType +
                 ", expiryDate=" + expiryDate +
                 ", owner=" + owner +
+                ", linkToken='" + linkToken + '\'' +
                 ", id=" + id +
                 '}';
     }
