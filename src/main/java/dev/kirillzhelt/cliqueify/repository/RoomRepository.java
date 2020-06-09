@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.Set;
 
 @Repository
-public interface RoomsRepository extends JpaRepository<Room, Long> {
+public interface RoomRepository extends JpaRepository<Room, Long> {
 
     Set<Room> findAllByPublicityType(PublicityType type);
     void deleteAllByExpiryDateEquals(LocalDate date);

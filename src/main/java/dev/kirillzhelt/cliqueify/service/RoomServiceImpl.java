@@ -2,7 +2,7 @@ package dev.kirillzhelt.cliqueify.service;
 
 import dev.kirillzhelt.cliqueify.model.PublicityType;
 import dev.kirillzhelt.cliqueify.model.Room;
-import dev.kirillzhelt.cliqueify.repository.RoomsRepository;
+import dev.kirillzhelt.cliqueify.repository.RoomRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.core.env.Environment;
@@ -15,13 +15,13 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
-public class RoomsServiceImpl implements RoomsService {
+public class RoomServiceImpl implements RoomService {
 
-    private final RoomsRepository repository;
+    private final RoomRepository repository;
     private final Environment environment;
 
-    public RoomsServiceImpl(RoomsRepository roomsRepository, Environment environment) {
-        this.repository = roomsRepository;
+    public RoomServiceImpl(RoomRepository roomRepository, Environment environment) {
+        this.repository = roomRepository;
         this.environment = environment;
     }
 
