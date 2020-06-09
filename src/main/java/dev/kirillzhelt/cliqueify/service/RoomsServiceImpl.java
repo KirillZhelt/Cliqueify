@@ -7,6 +7,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Key;
 import java.time.LocalDate;
@@ -46,6 +47,12 @@ public class RoomsServiceImpl implements RoomsService {
     @Override
     public Set<Room> getPublicRooms() {
         return this.repository.findAllByPublicityType(PublicityType.PUBLIC);
+    }
+
+    @Override
+    @Transactional
+    public void deleteExpiredRoomsForToday() {
+        this.repository.deleteAllByExpiryDateEquals(LocalDate.now());
     }
 
     private void generateLinkToken(Room room) {
