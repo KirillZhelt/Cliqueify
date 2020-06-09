@@ -4,7 +4,7 @@ import dev.kirillzhelt.cliqueify.dto.RoomCreationParamsDTO;
 import dev.kirillzhelt.cliqueify.model.PublicityType;
 import dev.kirillzhelt.cliqueify.model.Room;
 import dev.kirillzhelt.cliqueify.model.User;
-import dev.kirillzhelt.cliqueify.service.RoomsService;
+import dev.kirillzhelt.cliqueify.service.RoomService;
 import dev.kirillzhelt.cliqueify.service.UserService;
 import dev.kirillzhelt.cliqueify.validator.ExpiryDateValidator;
 import org.modelmapper.ModelMapper;
@@ -23,17 +23,17 @@ import java.util.Optional;
 import java.util.Set;
 
 @Controller
-class RoomsController {
+class RoomController {
 
-    private final RoomsService roomsService;
+    private final RoomService roomService;
     private final UserService userService;
 
     private final ModelMapper modelMapper;
     private final DateTimeFormatter dateFormatter;
 
-    public RoomsController(RoomsService roomsService, ModelMapper modelMapper, DateTimeFormatter dateFormatter,
-                           UserService userService) {
-        this.roomsService = roomsService;
+    public RoomController(RoomService roomService, ModelMapper modelMapper, DateTimeFormatter dateFormatter,
+                          UserService userService) {
+        this.roomService = roomService;
         this.userService = userService;
 
         this.modelMapper = modelMapper;
@@ -58,7 +58,7 @@ class RoomsController {
         Room room = this.modelMapper.map(roomParams, Room.class);
         User user = this.getUserFromPrincipal(principal);
         room.setOwner(user);
-        Room createdRoom = this.roomsService.createRoom(room);
+        Room createdRoom = this.roomService.createRoom(room);
 
         return String.format("redirect:/rooms/%d", createdRoom.getId());
     }
@@ -77,7 +77,7 @@ class RoomsController {
 
     @GetMapping("/rooms/{roomId}")
     public String room(@PathVariable long roomId, Model model, Principal principal) {
-        Optional<Room> roomOptional = this.roomsService.getRoomById(roomId);
+        Optional<Room> roomOptional = this.roomService.getRoomById(roomId);
 
         if (roomOptional.isPresent()) {
             Room room = roomOptional.get();
@@ -97,7 +97,7 @@ class RoomsController {
 
     @GetMapping("/rooms/link/{token}")
     public String roomByToken(@PathVariable String token, Model model) {
-        Optional<Room> roomOptional = this.roomsService.getRoomByToken(token);
+        Optional<Room> roomOptional = this.roomService.getRoomByToken(token);
         if (roomOptional.isPresent()) {
             model.addAttribute("room", roomOptional.get());
             return "room";
@@ -109,7 +109,7 @@ class RoomsController {
 
     @GetMapping("/browse-rooms")
     public String browseRooms(Model model) {
-        Set<Room> rooms = this.roomsService.getPublicRooms();
+        Set<Room> rooms = this.roomService.getPublicRooms();
         model.addAttribute("rooms", rooms);
         return "browse_rooms";
     }
