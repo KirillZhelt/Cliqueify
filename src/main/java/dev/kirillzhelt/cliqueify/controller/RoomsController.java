@@ -71,7 +71,7 @@ class RoomsController {
     @GetMapping("/rooms")
     public String rooms(Model model, Principal principal) {
         User user = this.getUserFromPrincipal(principal);
-        model.addAttribute("rooms", user.getRooms());
+        model.addAttribute("rooms", user.getLastExpiringRooms());
         return "rooms";
     }
 

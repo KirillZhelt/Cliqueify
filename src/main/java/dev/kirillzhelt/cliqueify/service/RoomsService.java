@@ -15,5 +15,6 @@ public interface RoomsService {
     Optional<Room> getRoomById(long id);
     Optional<Room> getRoomByToken(String token);
     Set<Room> getPublicRooms();
+    void deleteExpiredRoomsForToday();
 
 }
