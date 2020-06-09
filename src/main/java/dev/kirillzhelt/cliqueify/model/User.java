@@ -5,7 +5,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "t_user")
@@ -23,6 +26,13 @@ public class User extends IdentifiedModel implements UserDetails {
 
     public User() {
 
+    }
+
+    public List<Room> getLastExpiringRooms() {
+        return this.rooms
+                .stream()
+                .sorted(Comparator.comparing(Room::getExpiryDate).reversed())
+                .collect(Collectors.toList());
     }
 
     public void setUsername(String username) {
