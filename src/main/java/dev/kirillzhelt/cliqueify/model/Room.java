@@ -4,6 +4,10 @@ import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
+@Table(
+    indexes = {
+        @Index(name = "expiryDateIndex", columnList = "expiryDate"),
+    })
 public class Room extends IdentifiedModel {
 
     private String name;
