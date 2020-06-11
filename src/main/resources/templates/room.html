@@ -9,6 +9,10 @@
                 <h2 th:text="${room.name}"></h2>
 
                 <button type="button" class="btn btn-primary copy-link-btn">Copy room link to the buffer</button>
+
+                <br />
+
+                <textarea class="form-control mt-5" id="actions-area" style="width: 250px; height: 200px; resize: none" readonly></textarea>
             </div>
 
             <script>
@@ -31,6 +35,59 @@
                         copyToClipboard(url);
                     });
                 });
+            </script>
+
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js"></script>
+            <script type="text/javascript">
+                let stompClient = null;
+
+                function connect(onConnect) {
+                    const socket = new SockJS('http://localhost:8080/live');
+                    stompClient = Stomp.over(socket);
+                    stompClient.connect({}, function(frame) {
+                        console.log('Connected: ' + frame);
+                        stompClient.subscribe('/topic/' + '[[${room.id}]]', function(messageOutput) {
+                            showNewAction(JSON.parse(messageOutput.body));
+                        });
+                        onConnect();
+                    });
+                }
+
+                function disconnect() {
+                    if (stompClient != null) {
+                        stompClient.disconnect();
+                    }
+                    console.log("Disconnected");
+                }
+
+                function sendAction(message) {
+                    stompClient.send('/app/live-room/' + '[[${room.id}]]', {},
+                        JSON.stringify({'username': '[[${#authentication.getName()}]]', 'action': message}));
+                }
+
+                function showNewAction(action) {
+                    const actionsArea = document.getElementById('actions-area');
+                    actionsArea.textContent = actionsArea.textContent + action.username + ' ' + action.action + '\n';
+                }
+
+                function enterRoom() {
+                    connect(() => {
+                        sendAction("ENTER");
+                    });
+                }
+
+                function leaveRoom() {
+                    sendAction("LEAVE")
+                }
+
+                window.onload = () => {
+                    enterRoom();
+                }
+
+                window.onbeforeunload = () => {
+                    leaveRoom();
+                }
             </script>
         </section>
     </body>
