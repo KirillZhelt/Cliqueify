@@ -39,46 +39,29 @@
 
             <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js"></script>
-            <script type="text/javascript">
-                let stompClient = null;
+            <script th:src="@{/liveRoomClient.js}"></script>
 
-                function connect(onConnect) {
-                    const socket = new SockJS('http://localhost:8080/live');
-                    stompClient = Stomp.over(socket);
-                    stompClient.connect({}, function(frame) {
-                        console.log('Connected: ' + frame);
-                        stompClient.subscribe('/topic/' + '[[${room.id}]]', function(messageOutput) {
-                            showNewAction(JSON.parse(messageOutput.body));
-                        });
-                        onConnect();
-                    });
+            <script>
+                const liveRoomClient = new LiveRoomClient({
+                    'username': '[[${#authentication.getName()}]]',
+                    'host': 'http://localhost:8080/live',
+                    'sendTo': '/app/live-room/' + '[[${room.id}]]',
+                    'subscribeTo': '/topic/' + '[[${room.id}]]',
+                });
+
+                function enterRoom() {
+                    liveRoomClient.connect(() => {
+                        liveRoomClient.sendAction("ENTER");
+                    }, showNewAction);
                 }
 
-                function disconnect() {
-                    if (stompClient != null) {
-                        stompClient.disconnect();
-                    }
-                    console.log("Disconnected");
-                }
-
-                function sendAction(message) {
-                    stompClient.send('/app/live-room/' + '[[${room.id}]]', {},
-                        JSON.stringify({'username': '[[${#authentication.getName()}]]', 'action': message}));
+                function leaveRoom() {
+                    liveRoomClient.sendAction("LEAVE");
                 }
 
                 function showNewAction(action) {
                     const actionsArea = document.getElementById('actions-area');
                     actionsArea.textContent = actionsArea.textContent + action.username + ' ' + action.action + '\n';
-                }
-
-                function enterRoom() {
-                    connect(() => {
-                        sendAction("ENTER");
-                    });
-                }
-
-                function leaveRoom() {
-                    sendAction("LEAVE")
                 }
 
                 window.onload = () => {
@@ -89,6 +72,7 @@
                     leaveRoom();
                 }
             </script>
+
         </section>
     </body>
 </html>
