@@ -18,6 +18,12 @@
                 <br />
 
                 <div id="player"></div>
+
+                <br />
+
+                <button class="btn btn-primary" onclick="onPlayButtonClicked()">Play Video</button>
+                <button class="btn btn-primary" onclick="onPauseButtonClicked()">Pause Video</button>
+
             </div>
 
             <script>
@@ -56,17 +62,30 @@
 
                 function enterRoom() {
                     liveRoomClient.connect(() => {
-                        liveRoomClient.sendAction("ENTER");
-                    }, showNewAction);
+                        liveRoomClient.sendAction({ type: "ENTER" });
+                    }, receiveAction);
                 }
 
                 function leaveRoom() {
-                    liveRoomClient.sendAction("LEAVE");
+                    liveRoomClient.sendAction({ type: "LEAVE" });
                 }
 
-                function showNewAction(action) {
+                function countCurrentElapsedTime(startedToPlay, elapsedTime) {
+                    const secondsPassed = (new Date() - Date.parse(startedToPlay)) / 1000;
+                    return elapsedTime + secondsPassed;
+                }
+
+                function receiveAction(action) {
                     const actionsArea = document.getElementById('actions-area');
-                    actionsArea.textContent = actionsArea.textContent + action.username + ' ' + action.action + '\n';
+                    actionsArea.textContent = actionsArea.textContent + action.username + ' ' + action.action.type + '\n';
+
+                    if (action.username !== '[[${#authentication.getName()}]]') {
+                        if (action.action.type === 'PLAY') {
+                            playVideoFrom(countCurrentElapsedTime(action.action.startedToPlayTime, action.action.elapsedTime));
+                        } else if (action.action.type === 'PAUSE') {
+                            pauseVideoOn(action.action.elapsedTimeWhenPaused);
+                        }
+                    }
                 }
 
                 window.onload = () => {
@@ -96,29 +115,74 @@
                         videoId: 'M7lc1UVf-VE',
                         events: {
                             'onReady': onPlayerReady,
-                            'onStateChange': onPlayerStateChange
                         }
                     });
                 }
 
                 // 4. The API will call this function when the video player is ready.
                 function onPlayerReady(event) {
-                    event.target.playVideo();
+                    playVideoFrom(0);
+                    pauseVideo();
                 }
 
-                // 5. The API calls this function when the player's state changes.
-                //    The function indicates that when playing a video (state=1),
-                //    the player should play for six seconds and then stop.
-                let done = false;
-                function onPlayerStateChange(event) {
-                    if (event.data == YT.PlayerState.PLAYING && !done) {
-                        setTimeout(stopVideo, 6000);
-                        done = true;
+                function fillTwoDigits(num) {
+                    if (num < 10) {
+                        return '0' + num;
                     }
+
+                    return num.toString();
                 }
 
-                function stopVideo() {
-                    player.stopVideo();
+                function formatDate(date) {
+                    let formatted = `${date.getFullYear()}-`;
+
+                    formatted += fillTwoDigits(date.getMonth() + 1);
+                    formatted += '-';
+                    formatted += fillTwoDigits(date.getDate());
+                    formatted += 'T';
+                    formatted += fillTwoDigits(date.getHours());
+                    formatted += ':';
+                    formatted += fillTwoDigits(date.getMinutes());
+                    formatted += ':';
+                    formatted += fillTwoDigits(date.getSeconds());
+
+                    return formatted;
+                }
+
+                function onPlayButtonClicked() {
+                    playVideo();
+                    liveRoomClient.sendAction({
+                        type: "PLAY",
+                        elapsedTime: player.getCurrentTime(),
+                        startedToPlayTime: formatDate(new Date()),
+                    });
+                }
+
+                function onPauseButtonClicked() {
+                    pauseVideo();
+                    liveRoomClient.sendAction({ type: "PAUSE", elapsedTimeWhenPaused: player.getCurrentTime() });
+                }
+
+                function seekTo(seconds) {
+                    player.seekTo(seconds, true);
+                }
+
+                function playVideo() {
+                    player.playVideo();
+                }
+
+                function playVideoFrom(seconds) {
+                    seekTo(seconds);
+                    playVideo();
+                }
+
+                function pauseVideoOn(seconds) {
+                    pauseVideo();
+                    seekTo(seconds);
+                }
+
+                function pauseVideo() {
+                    player.pauseVideo();
                 }
 
             </script>
