@@ -21,171 +21,27 @@
 
                 <br />
 
-                <button class="btn btn-primary" onclick="onPlayButtonClicked()">Play Video</button>
-                <button class="btn btn-primary" onclick="onPauseButtonClicked()">Pause Video</button>
+                <button class="btn btn-primary" onclick="onPlayButtonClicked()">Synchronized play</button>
+                <button class="btn btn-primary" onclick="onPauseButtonClicked()">Synchronized pause</button>
 
             </div>
 
             <script>
-                function copyToClipboard(s) {
-                    const el = document.createElement('textarea');
-                    el.value = s;
-                    el.setAttribute('readonly', '');
-                    el.style.position = 'absolute';
-                    el.style.left = '-9999px';
-                    document.body.appendChild(el);
-                    el.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(el);
-                }
-
-                const elements = document.querySelectorAll('.copy-link-btn');
-                Array.from(elements).forEach(e => {
-                    e.addEventListener('click', () => {
-                        const url = window.location.host + '/rooms/link/[[${room.linkToken}]]';
-                        copyToClipboard(url);
-                    });
-                });
+                const roomLinkToken = '[[${room.linkToken}]]';
             </script>
+            <script th:src="@{/js/clipboard.js}"></script>
 
             <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js"></script>
-            <script th:src="@{/liveRoomClient.js}"></script>
+            <script th:src="@{/js/liveRoomClient.js}"></script>
 
             <script>
-                const liveRoomClient = new LiveRoomClient({
-                    'username': '[[${#authentication.getName()}]]',
-                    'host': 'http://localhost:8080/live',
-                    'sendTo': '/app/live-room/' + '[[${room.id}]]',
-                    'subscribeTo': '/topic/' + '[[${room.id}]]',
-                });
-
-                function enterRoom() {
-                    liveRoomClient.connect(() => {
-                        liveRoomClient.sendAction({ type: "ENTER" });
-                    }, receiveAction);
-                }
-
-                function leaveRoom() {
-                    liveRoomClient.sendAction({ type: "LEAVE" });
-                }
-
-                function countCurrentElapsedTime(startedToPlay, elapsedTime) {
-                    const secondsPassed = (new Date() - Date.parse(startedToPlay)) / 1000;
-                    return elapsedTime + secondsPassed;
-                }
-
-                function receiveAction(action) {
-                    const actionsArea = document.getElementById('actions-area');
-                    actionsArea.textContent = actionsArea.textContent + action.username + ' ' + action.action.type + '\n';
-
-                    if (action.username !== '[[${#authentication.getName()}]]') {
-                        if (action.action.type === 'PLAY') {
-                            playVideoFrom(countCurrentElapsedTime(action.action.startedToPlayTime, action.action.elapsedTime));
-                        } else if (action.action.type === 'PAUSE') {
-                            pauseVideoOn(action.action.elapsedTimeWhenPaused);
-                        }
-                    }
-                }
-
-                window.onload = () => {
-                    enterRoom();
-                }
-
-                window.onbeforeunload = () => {
-                    leaveRoom();
-                }
+                const username = '[[${#authentication.getName()}]]';
+                const roomId = '[[${room.id}]]';
             </script>
+            <script th:src="@{/js/room.js}"></script>
 
-            <script>
-                // 2. This code loads the IFrame Player API code asynchronously.
-                const tag = document.createElement('script');
-
-                tag.src = "https://www.youtube.com/iframe_api";
-                const firstScriptTag = document.getElementsByTagName('script')[0];
-                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-                // 3. This function creates an <iframe> (and YouTube player)
-                //    after the API code downloads.
-                let player;
-                function onYouTubeIframeAPIReady() {
-                    player = new YT.Player('player', {
-                        height: '390',
-                        width: '640',
-                        videoId: 'M7lc1UVf-VE',
-                        events: {
-                            'onReady': onPlayerReady,
-                        }
-                    });
-                }
-
-                // 4. The API will call this function when the video player is ready.
-                function onPlayerReady(event) {
-                    playVideoFrom(0);
-                    pauseVideo();
-                }
-
-                function fillTwoDigits(num) {
-                    if (num < 10) {
-                        return '0' + num;
-                    }
-
-                    return num.toString();
-                }
-
-                function formatDate(date) {
-                    let formatted = `${date.getFullYear()}-`;
-
-                    formatted += fillTwoDigits(date.getMonth() + 1);
-                    formatted += '-';
-                    formatted += fillTwoDigits(date.getDate());
-                    formatted += 'T';
-                    formatted += fillTwoDigits(date.getHours());
-                    formatted += ':';
-                    formatted += fillTwoDigits(date.getMinutes());
-                    formatted += ':';
-                    formatted += fillTwoDigits(date.getSeconds());
-
-                    return formatted;
-                }
-
-                function onPlayButtonClicked() {
-                    playVideo();
-                    liveRoomClient.sendAction({
-                        type: "PLAY",
-                        elapsedTime: player.getCurrentTime(),
-                        startedToPlayTime: formatDate(new Date()),
-                    });
-                }
-
-                function onPauseButtonClicked() {
-                    pauseVideo();
-                    liveRoomClient.sendAction({ type: "PAUSE", elapsedTimeWhenPaused: player.getCurrentTime() });
-                }
-
-                function seekTo(seconds) {
-                    player.seekTo(seconds, true);
-                }
-
-                function playVideo() {
-                    player.playVideo();
-                }
-
-                function playVideoFrom(seconds) {
-                    seekTo(seconds);
-                    playVideo();
-                }
-
-                function pauseVideoOn(seconds) {
-                    pauseVideo();
-                    seekTo(seconds);
-                }
-
-                function pauseVideo() {
-                    player.pauseVideo();
-                }
-
-            </script>
+            <script th:src="@{/js/player.js}"></script>
 
         </section>
     </body>
