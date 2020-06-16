@@ -9,7 +9,6 @@ function onYouTubeIframeAPIReady() {
     player = new YT.Player('player', {
         height: '390',
         width: '640',
-        videoId: 'M7lc1UVf-VE',
         events: {
             'onReady': onPlayerReady,
         }
@@ -41,4 +40,11 @@ function pauseVideoOn(seconds) {
 
 function pauseVideo() {
     player.pauseVideo();
+}
+
+function loadVideo(videoId, seconds) {
+    const playerDiv = document.getElementById("player");
+    playerDiv.dataset.videoId = videoId;
+
+    player.loadVideoById(videoId, seconds);
 }

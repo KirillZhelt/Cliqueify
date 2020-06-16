@@ -10,6 +10,7 @@ import java.util.Set;
 public interface RoomService {
 
     Room createRoom(Room room);
+    Room updateRoom(Room room);
     Optional<Room> getRoomById(long id);
     Optional<Room> getRoomByToken(String token);
     Set<Room> getPublicRooms();

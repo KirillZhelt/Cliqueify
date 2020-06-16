@@ -1,10 +1,3 @@
-const liveRoomClient = new LiveRoomClient({
-    'username': username,
-    'host': 'http://localhost:8080/live',
-    'sendTo': '/app/live-room/' + roomId,
-    'subscribeTo': '/topic/' + roomId,
-});
-
 function enterRoom() {
     liveRoomClient.connect(() => {
         liveRoomClient.sendAction({ type: "ENTER" });
@@ -29,16 +22,10 @@ function receiveAction(action) {
             playVideoFrom(countCurrentElapsedTime(action.action.startedToPlayTime, action.action.elapsedTime));
         } else if (action.action.type === 'PAUSE') {
             pauseVideoOn(action.action.elapsedTimeWhenPaused);
+        } else if (action.action.type === 'LOAD') {
+            loadVideo(action.action.videoId, countCurrentElapsedTime(action.action.startedToPlayTime, 0));
         }
     }
-}
-
-window.onload = () => {
-    enterRoom();
-}
-
-window.onbeforeunload = () => {
-    leaveRoom();
 }
 
 function fillTwoDigits(num) {
@@ -67,14 +54,48 @@ function formatDate(date) {
 
 function onPlayButtonClicked() {
     playVideo();
+
+    const playerDiv = document.getElementById("player");
+    const videoId = playerDiv.dataset.videoId;
+
     liveRoomClient.sendAction({
         type: "PLAY",
         elapsedTime: player.getCurrentTime(),
         startedToPlayTime: formatDate(new Date()),
+        videoId: videoId,
     });
 }
 
 function onPauseButtonClicked() {
     pauseVideo();
-    liveRoomClient.sendAction({ type: "PAUSE", elapsedTimeWhenPaused: player.getCurrentTime() });
+
+    const playerDiv = document.getElementById("player");
+    const videoId = playerDiv.dataset.videoId;
+
+    liveRoomClient.sendAction({ type: "PAUSE", elapsedTimeWhenPaused: player.getCurrentTime(), videoId: videoId });
+}
+
+function onVideoClick(e) {
+    const videoId = e.target.dataset.videoId;
+    loadVideo(videoId);
+    liveRoomClient.sendAction({ type: 'LOAD', videoId: videoId, startedToPlayTime: formatDate(new Date()) });
+}
+
+const liveRoomClient = new LiveRoomClient({
+    'username': username,
+    'host': 'http://localhost:8080/live',
+    'sendTo': '/app/live-room/' + roomId,
+    'subscribeTo': '/topic/' + roomId,
+});
+
+window.onload = () => {
+    enterRoom();
+
+    Array.from(document.querySelectorAll(".video-item")).forEach((el) => {
+        el.addEventListener('click', onVideoClick);
+    });
+}
+
+window.onbeforeunload = () => {
+    leaveRoom();
 }
