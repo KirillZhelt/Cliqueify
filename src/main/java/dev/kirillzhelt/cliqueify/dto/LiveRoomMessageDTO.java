@@ -1,11 +1,13 @@
 package dev.kirillzhelt.cliqueify.dto;
 
+import dev.kirillzhelt.cliqueify.dto.actions.LiveRoomAction;
+
 public class LiveRoomMessageDTO {
 
     private String username;
-    private LiveRoomActionType action;
+    private LiveRoomAction action;
 
-    public LiveRoomMessageDTO(String username, LiveRoomActionType action) {
+    public LiveRoomMessageDTO(String username, LiveRoomAction action) {
         this.username = username;
         this.action = action;
     }
@@ -18,11 +20,11 @@ public class LiveRoomMessageDTO {
         this.username = username;
     }
 
-    public LiveRoomActionType getAction() {
+    public LiveRoomAction getAction() {
         return action;
     }
 
-    public void setAction(LiveRoomActionType action) {
+    public void setAction(LiveRoomAction action) {
         this.action = action;
     }
 

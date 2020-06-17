@@ -33,6 +33,11 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    public Room updateRoom(Room room) {
+        return this.repository.save(room);
+    }
+
+    @Override
     public Optional<Room> getRoomById(long id) {
         return this.repository.findById(id);
     }

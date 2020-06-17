@@ -6,89 +6,81 @@
     <body>
         <section>
             <div class="mt-3 ml-5 mb-3">
+
                 <h2 th:text="${room.name}"></h2>
 
                 <button type="button" class="btn btn-primary copy-link-btn">Copy room link to the buffer</button>
 
                 <br />
 
-                <textarea class="form-control mt-5" id="actions-area" style="width: 250px; height: 200px; resize: none" readonly></textarea>
+                <div class="container" style="max-width: 100%;">
+                    <div class="row">
+                        <div class="col-6">
+                            <textarea class="form-control mt-5" id="actions-area" style="width: 250px; height: 200px; resize: none" readonly></textarea>
+
+                            <br />
+                            <br />
+
+                            <div id="player"></div>
+
+                            <br />
+
+                            <button class="btn btn-primary" onclick="onPlayButtonClicked()">Synchronized play</button>
+                            <button class="btn btn-primary" onclick="onPauseButtonClicked()">Synchronized pause</button>
+
+                        </div>
+                        <div class="col-6">
+                            <ul>
+                                <li><a class="video-item" data-video-id="PsEoh8jOvik">PsEoh8jOvik</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <script>
-                function copyToClipboard(s) {
-                    const el = document.createElement('textarea');
-                    el.value = s;
-                    el.setAttribute('readonly', '');
-                    el.style.position = 'absolute';
-                    el.style.left = '-9999px';
-                    document.body.appendChild(el);
-                    el.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(el);
-                }
-
-                const elements = document.querySelectorAll('.copy-link-btn');
-                Array.from(elements).forEach(e => {
-                    e.addEventListener('click', () => {
-                        const url = window.location.host + '/rooms/link/[[${room.linkToken}]]';
-                        copyToClipboard(url);
-                    });
-                });
+                const roomLinkToken = '[[${room.linkToken}]]';
             </script>
+            <script th:src="@{/js/clipboard.js}"></script>
 
             <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js"></script>
-            <script type="text/javascript">
-                let stompClient = null;
+            <script th:src="@{/js/liveRoomClient.js}"></script>
 
-                function connect(onConnect) {
-                    const socket = new SockJS('http://localhost:8080/live');
-                    stompClient = Stomp.over(socket);
-                    stompClient.connect({}, function(frame) {
-                        console.log('Connected: ' + frame);
-                        stompClient.subscribe('/topic/' + '[[${room.id}]]', function(messageOutput) {
-                            showNewAction(JSON.parse(messageOutput.body));
-                        });
-                        onConnect();
-                    });
-                }
-
-                function disconnect() {
-                    if (stompClient != null) {
-                        stompClient.disconnect();
-                    }
-                    console.log("Disconnected");
-                }
-
-                function sendAction(message) {
-                    stompClient.send('/app/live-room/' + '[[${room.id}]]', {},
-                        JSON.stringify({'username': '[[${#authentication.getName()}]]', 'action': message}));
-                }
-
-                function showNewAction(action) {
-                    const actionsArea = document.getElementById('actions-area');
-                    actionsArea.textContent = actionsArea.textContent + action.username + ' ' + action.action + '\n';
-                }
-
-                function enterRoom() {
-                    connect(() => {
-                        sendAction("ENTER");
-                    });
-                }
-
-                function leaveRoom() {
-                    sendAction("LEAVE")
-                }
-
-                window.onload = () => {
-                    enterRoom();
-                }
-
-                window.onbeforeunload = () => {
-                    leaveRoom();
-                }
+            <script>
+                const username = '[[${#authentication.getName()}]]';
+                const roomId = '[[${room.id}]]';
             </script>
+            <script th:src="@{/js/room.js}"></script>
+
+            <script>
+                const startVideoId = '[[${room.currentVideo?.videoId}]]';
+
+                let startState = null;
+            </script>
+
+            <script th:if="${room.currentVideo?.state instanceof T(dev.kirillzhelt.cliqueify.model.PausedState)}">
+                startState = {
+                    type: 'PAUSED',
+                    elapsedTimeWhenPaused: [[${room.currentVideo.state.elapsedTimeWhenPaused}]],
+                };
+            </script>
+
+            <script th:if="${room.currentVideo?.state instanceof T(dev.kirillzhelt.cliqueify.model.PlayingState)}">
+                startState = {
+                    type: 'PLAYING',
+                    startedToPlayTime: '[[${room.currentVideo.state.startedToPlayTime}]]',
+                    elapsedTime: [[${room.currentVideo.state.elapsedTime}]],
+                };
+            </script>
+
+            <script>
+                let firstTimePlaying = true;
+            </script>
+
+            <script th:src="@{/js/player.js}"></script>
+
         </section>
     </body>
 </html>

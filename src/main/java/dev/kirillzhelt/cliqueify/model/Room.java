@@ -22,6 +22,9 @@ public class Room extends IdentifiedModel {
 
     private String linkToken;
 
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    private CurrentVideo currentVideo;
+
     public Room() {
     }
 
@@ -72,6 +75,14 @@ public class Room extends IdentifiedModel {
         this.linkToken = linkToken;
     }
 
+    public CurrentVideo getCurrentVideo() {
+        return currentVideo;
+    }
+
+    public void setCurrentVideo(CurrentVideo currentVideo) {
+        this.currentVideo = currentVideo;
+    }
+
     @Override
     public String toString() {
         return "Room{" +
@@ -80,6 +91,7 @@ public class Room extends IdentifiedModel {
                 ", expiryDate=" + expiryDate +
                 ", owner=" + owner +
                 ", linkToken='" + linkToken + '\'' +
+                ", currentVideo=" + currentVideo +
                 ", id=" + id +
                 '}';
     }
