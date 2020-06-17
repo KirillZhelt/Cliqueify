@@ -9,7 +9,8 @@ function leaveRoom() {
 }
 
 function countCurrentElapsedTime(startedToPlay, elapsedTime) {
-    const secondsPassed = (new Date() - Date.parse(startedToPlay)) / 1000;
+    const now = new Date();
+    const secondsPassed = (new Date(now.toUTCString()) - Date.parse(startedToPlay)) / 1000;
     return elapsedTime + secondsPassed;
 }
 
@@ -36,7 +37,9 @@ function fillTwoDigits(num) {
     return num.toString();
 }
 
-function formatDate(date) {
+function formatDateUTC(date) {
+    date = new Date(date.toUTCString());
+
     let formatted = `${date.getFullYear()}-`;
 
     formatted += fillTwoDigits(date.getMonth() + 1);
@@ -61,7 +64,7 @@ function onPlayButtonClicked() {
     liveRoomClient.sendAction({
         type: "PLAY",
         elapsedTime: player.getCurrentTime(),
-        startedToPlayTime: formatDate(new Date()),
+        startedToPlayTime: formatDateUTC(new Date()),
         videoId: videoId,
     });
 }
@@ -78,7 +81,7 @@ function onPauseButtonClicked() {
 function onVideoClick(e) {
     const videoId = e.target.dataset.videoId;
     loadVideo(videoId);
-    liveRoomClient.sendAction({ type: 'LOAD', videoId: videoId, startedToPlayTime: formatDate(new Date()) });
+    liveRoomClient.sendAction({ type: 'LOAD', videoId: videoId, startedToPlayTime: formatDateUTC(new Date()) });
 }
 
 const liveRoomClient = new LiveRoomClient({
