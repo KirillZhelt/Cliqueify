@@ -11,13 +11,43 @@ function onYouTubeIframeAPIReady() {
         width: '640',
         events: {
             'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange,
         }
     });
 }
 
+function onPlayerStateChange(e) {
+    console.log(e.data);
+
+    if (e.data === YT.PlayerState.PLAYING) {
+        if (firstTimePlaying) {
+            firstTimePlaying = false;
+            onVideoLoaded();
+        }
+    }
+}
+
 function onPlayerReady(event) {
-    playVideoFrom(0);
-    pauseVideo();
+    if (startVideoId !== '') {
+        if (startState !== null) {
+            let seconds = 0;
+            if (startState.type === 'PAUSED') {
+                seconds = startState.elapsedTimeWhenPaused;
+            } else if (startState.type === 'PLAYING') {
+                seconds = countCurrentElapsedTime(startState.startedToPlayTime, startState.elapsedTime);
+            }
+
+            loadVideo(startVideoId, seconds);
+        }
+    }
+}
+
+function onVideoLoaded() {
+    if (startState.type === 'PAUSED') {
+        pauseVideo();
+    } else if (startState.type === 'PLAYING') {
+        playVideo();
+    }
 }
 
 function seekTo(seconds) {

@@ -61,6 +61,9 @@ function onPlayButtonClicked() {
     const playerDiv = document.getElementById("player");
     const videoId = playerDiv.dataset.videoId;
 
+    // seekTo(60, true);
+    console.log('current: ' + player.getCurrentTime());
+
     liveRoomClient.sendAction({
         type: "PLAY",
         elapsedTime: player.getCurrentTime(),

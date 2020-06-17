@@ -54,6 +54,31 @@
             </script>
             <script th:src="@{/js/room.js}"></script>
 
+            <script>
+                const startVideoId = '[[${room.currentVideo?.videoId}]]';
+
+                let startState = null;
+            </script>
+
+            <script th:if="${room.currentVideo?.state instanceof T(dev.kirillzhelt.cliqueify.model.PausedState)}">
+                startState = {
+                    type: 'PAUSED',
+                    elapsedTimeWhenPaused: [[${room.currentVideo.state.elapsedTimeWhenPaused}]],
+                };
+            </script>
+
+            <script th:if="${room.currentVideo?.state instanceof T(dev.kirillzhelt.cliqueify.model.PlayingState)}">
+                startState = {
+                    type: 'PLAYING',
+                    startedToPlayTime: '[[${room.currentVideo.state.startedToPlayTime}]]',
+                    elapsedTime: [[${room.currentVideo.state.elapsedTime}]],
+                };
+            </script>
+
+            <script>
+                let firstTimePlaying = true;
+            </script>
+
             <script th:src="@{/js/player.js}"></script>
 
         </section>
