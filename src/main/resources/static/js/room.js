@@ -25,6 +25,8 @@ function receiveAction(action) {
             pauseVideoOn(action.action.elapsedTimeWhenPaused);
         } else if (action.action.type === 'LOAD') {
             loadVideo(action.action.videoId, countCurrentElapsedTime(action.action.startedToPlayTime, 0));
+        } else if (action.action.type === 'ADD_VIDEO') {
+            addVideoToPlaylist(action.action.videoId);
         }
     }
 }
@@ -85,6 +87,36 @@ function onVideoClick(e) {
     const videoId = e.target.dataset.videoId;
     loadVideo(videoId);
     liveRoomClient.sendAction({ type: 'LOAD', videoId: videoId, startedToPlayTime: formatDateUTC(new Date()) });
+}
+
+function getYoutubeId(url){
+    const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[7].length === 11) ? match[7] : false;
+}
+
+function createPlaylistItem(videoId) {
+    const playlistItem = document.createElement('a');
+    playlistItem.className = 'video-item list-group-item list-group-item-action';
+    playlistItem.dataset.videoId = videoId;
+    playlistItem.textContent = videoId;
+    playlistItem.addEventListener('click', onVideoClick);
+
+    return playlistItem;
+}
+
+function onAddVideoButtonClicked() {
+    const url = document.getElementById('video-url').value;
+    const videoId = getYoutubeId(url);
+
+    addVideoToPlaylist(videoId);
+
+    liveRoomClient.sendAction({ type: 'ADD_VIDEO', videoId: videoId });
+}
+
+function addVideoToPlaylist(videoId) {
+    const playlist = document.getElementById('playlist');
+    playlist.append(createPlaylistItem(videoId));
 }
 
 const liveRoomClient = new LiveRoomClient({

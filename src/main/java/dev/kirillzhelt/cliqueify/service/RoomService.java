@@ -15,5 +15,6 @@ public interface RoomService {
     Optional<Room> getRoomByToken(String token);
     Set<Room> getPublicRooms();
     void deleteExpiredRoomsForToday();
+    void addVideoToPlaylist(long roomId, String videoId);
 
 }

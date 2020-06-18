@@ -44,9 +44,9 @@ function onPlayerReady(event) {
 
 function onVideoLoaded() {
     if (startState.type === 'PAUSED') {
-        pauseVideo();
+        pauseVideoOn(startState.elapsedTimeWhenPaused);
     } else if (startState.type === 'PLAYING') {
-        playVideo();
+        playVideoFrom(countCurrentElapsedTime(startState.startedToPlayTime, startState.startedToPlayTime));
     }
 }
 

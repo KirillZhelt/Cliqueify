@@ -7,6 +7,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Key;
@@ -58,6 +59,16 @@ public class RoomServiceImpl implements RoomService {
     @Transactional
     public void deleteExpiredRoomsForToday() {
         this.repository.deleteAllByExpiryDateEquals(LocalDate.now());
+    }
+
+    @Override
+    @Transactional
+    public void addVideoToPlaylist(long roomId, String videoId) {
+        Optional<Room> roomOptional = this.getRoomById(roomId);
+        roomOptional.ifPresent(room -> {
+            room.getPlaylist().addVideo(videoId);
+            this.updateRoom(room);
+        });
     }
 
     private void generateLinkToken(Room room) {
