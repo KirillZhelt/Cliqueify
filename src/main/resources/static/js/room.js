@@ -8,6 +8,13 @@ function leaveRoom() {
     liveRoomClient.sendAction({ type: "LEAVE" });
 }
 
+async function loadTitleForYoutubeVideo(videoId) {
+    const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=AIzaSyC5y5ZFISW78pApDha-pSycQbSYqXPyMc0`);
+    if (response.ok) {
+        return (await response.json()).items[0].snippet.title;
+    }
+}
+
 function countCurrentElapsedTime(startedToPlay, elapsedTime) {
     const now = new Date();
     const secondsPassed = (new Date(now.toUTCString()) - Date.parse(startedToPlay)) / 1000;
@@ -25,6 +32,8 @@ function receiveAction(action) {
             pauseVideoOn(action.action.elapsedTimeWhenPaused);
         } else if (action.action.type === 'LOAD') {
             loadVideo(action.action.videoId, countCurrentElapsedTime(action.action.startedToPlayTime, 0));
+        } else if (action.action.type === 'ADD_VIDEO') {
+            addVideoToPlaylist(action.action.videoId);
         }
     }
 }
@@ -87,6 +96,40 @@ function onVideoClick(e) {
     liveRoomClient.sendAction({ type: 'LOAD', videoId: videoId, startedToPlayTime: formatDateUTC(new Date()) });
 }
 
+function getYoutubeId(url){
+    const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[7].length === 11) ? match[7] : false;
+}
+
+function createPlaylistItem(videoId) {
+    const playlistItem = document.createElement('a');
+    playlistItem.className = 'video-item list-group-item list-group-item-action';
+    playlistItem.dataset.videoId = videoId;
+    playlistItem.textContent = videoId;
+    playlistItem.addEventListener('click', onVideoClick);
+
+    loadTitleForYoutubeVideo(videoId).then((result) => {
+        playlistItem.textContent = result;
+    });
+
+    return playlistItem;
+}
+
+function onAddVideoButtonClicked() {
+    const url = document.getElementById('video-url').value;
+    const videoId = getYoutubeId(url);
+
+    addVideoToPlaylist(videoId);
+
+    liveRoomClient.sendAction({ type: 'ADD_VIDEO', videoId: videoId });
+}
+
+function addVideoToPlaylist(videoId) {
+    const playlist = document.getElementById('playlist');
+    playlist.append(createPlaylistItem(videoId));
+}
+
 const liveRoomClient = new LiveRoomClient({
     'username': username,
     'host': 'http://localhost:8080/live',
@@ -99,6 +142,10 @@ window.onload = () => {
 
     Array.from(document.querySelectorAll(".video-item")).forEach((el) => {
         el.addEventListener('click', onVideoClick);
+
+        loadTitleForYoutubeVideo(el.dataset.videoId).then((result) => {
+            el.textContent = result;
+        });
     });
 }
 

@@ -25,7 +25,11 @@ public class Room extends IdentifiedModel {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private CurrentVideo currentVideo;
 
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    private Playlist playlist;
+
     public Room() {
+        this.playlist = new Playlist();
     }
 
     public Room(String name, PublicityType publicityType, LocalDate expiryDate, User owner) {
@@ -33,6 +37,8 @@ public class Room extends IdentifiedModel {
         this.publicityType = publicityType;
         this.expiryDate = expiryDate;
         this.owner = owner;
+
+        this.playlist = new Playlist();
     }
 
     public String getName() {
@@ -81,6 +87,14 @@ public class Room extends IdentifiedModel {
 
     public void setCurrentVideo(CurrentVideo currentVideo) {
         this.currentVideo = currentVideo;
+    }
+
+    public Playlist getPlaylist() {
+        return playlist;
+    }
+
+    public void setPlaylist(Playlist playlist) {
+        this.playlist = playlist;
     }
 
     @Override

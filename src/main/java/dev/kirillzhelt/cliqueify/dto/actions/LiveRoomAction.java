@@ -14,6 +14,7 @@ import dev.kirillzhelt.cliqueify.dto.actions.processors.LiveRoomActionProcessor;
         @JsonSubTypes.Type(value = PlayLiveRoom.class, name = "PLAY"),
         @JsonSubTypes.Type(value = PauseLiveRoom.class, name = "PAUSE"),
         @JsonSubTypes.Type(value = LoadLiveRoom.class, name = "LOAD"),
+        @JsonSubTypes.Type(value = AddVideoLiveRoom.class, name = "ADD_VIDEO"),
 })
 public interface LiveRoomAction {
 

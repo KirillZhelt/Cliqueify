@@ -30,9 +30,17 @@
 
                         </div>
                         <div class="col-6">
-                            <ul>
-                                <li><a class="video-item" data-video-id="PsEoh8jOvik">PsEoh8jOvik</a></li>
-                            </ul>
+
+                            <div class="form-group">
+                                <input type="text" id="video-url" class="form-control" placeholder="YouTube video URL" />
+                                <button class="btn btn-primary mt-3" onclick="onAddVideoButtonClicked()">Add video</button>
+                            </div>
+
+                            <div id="playlist" class="list-group">
+                                <th:block th:each="videoId : ${room.playlist.videoIds}">
+                                    <a class="video-item list-group-item list-group-item-action" th:data-video-id="${videoId}" th:text="${videoId}"></a>
+                                </th:block>
+                            </div>
                         </div>
                     </div>
                 </div>
