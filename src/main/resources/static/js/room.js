@@ -8,6 +8,13 @@ function leaveRoom() {
     liveRoomClient.sendAction({ type: "LEAVE" });
 }
 
+async function loadTitleForYoutubeVideo(videoId) {
+    const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=AIzaSyC5y5ZFISW78pApDha-pSycQbSYqXPyMc0`);
+    if (response.ok) {
+        return (await response.json()).items[0].snippet.title;
+    }
+}
+
 function countCurrentElapsedTime(startedToPlay, elapsedTime) {
     const now = new Date();
     const secondsPassed = (new Date(now.toUTCString()) - Date.parse(startedToPlay)) / 1000;
@@ -102,6 +109,10 @@ function createPlaylistItem(videoId) {
     playlistItem.textContent = videoId;
     playlistItem.addEventListener('click', onVideoClick);
 
+    loadTitleForYoutubeVideo(videoId).then((result) => {
+        playlistItem.textContent = result;
+    });
+
     return playlistItem;
 }
 
@@ -131,6 +142,10 @@ window.onload = () => {
 
     Array.from(document.querySelectorAll(".video-item")).forEach((el) => {
         el.addEventListener('click', onVideoClick);
+
+        loadTitleForYoutubeVideo(el.dataset.videoId).then((result) => {
+            el.textContent = result;
+        });
     });
 }
 
